@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="HandheldFriendly" content="true" />
+    <meta name="theme-color" content="black" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar" content="#000">
+    <meta name="google" content="notranslate">
+    <link rel="stylesheet" type="text/css" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <script type="text/javascript" src='https://www.gstatic.com/firebasejs/8.4.3/firebase-app.js'></script>
+    <script type="text/javascript" src="https://www.gstatic.com/firebasejs/8.4.3/firebase-auth.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/firebasejs/8.4.3/firebase-database.js"></script>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <title>Mirage Twitch Chat</title>
+    <style type="text/css">
+        body {
+            font-family: sans-serif;
+            background: #111;
+            /* color: #dedede !important; */
+            color: black;
+            overflow-x: hidden;
+        }
+
+        #header {
+            position: fixed;
+            z-index: 2;
+            background: black;
+            width: 100%;
+            top: 0;
+        }
+
+        h2 {
+            width: auto;
+            text-align: center;
+        }
+
+        #recentsContainer {
+            background-color: #333;
+            width: 50%;
+            margin: auto;
+            margin-top: 6%;
+        }
+
+        #recents {
+            margin: auto;
+            width: 100%;
+            height: 100%;
+            padding: 8px;
+        }
+
+        span {
+            display: block;
+            color: white;
+            font-size: 14pt;
+            margin: auto;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            height: 30px;
+        }
+
+        .username {
+            display: inline;
+        }
+
+        .emote, i {
+            height: 28px;
+            width: 28px;
+            display: inline-block;
+            /* Other styles here */
+        }
+
+        .emote:hover {
+            
+        }
+
+        .PogU {
+            background: url('https://cdn.betterttv.net/emote/5e4e7a1f08b4447d56a92967/1x');
+        }
+
+        .OMEGALUL {
+            background: url('https://cdn.betterttv.net/emote/583089f4737a8e61abb0186b/1x');
+        }
+
+        .KEKW {
+            background: url('https://cdn.betterttv.net/emote/5e9c6c187e090362f8b0b9e8/1x');
+        }
+
+        .monkaS {
+            background: url('https://cdn.betterttv.net/emote/56e9f494fff3cc5c35e5287e/1x');
+        }
+
+        .modCheck {
+            background: url('https://cdn.betterttv.net/emote/5d7eefb7c0652668c9e4d394/1x');
+        }
+
+        .Sadge {
+            background: url('https://cdn.betterttv.net/emote/5e0fa9d40550d42106b8a489/1x');
+        }
+
+        .Pog {
+            background: url('https://cdn.betterttv.net/emote/5ff827395ef7d10c7912c106/1x');
+        }
+
+        .peepoLeave {
+            background: url('https://cdn.betterttv.net/emote/5d324913ff6ed36801311fd2/1x');
+        }
+
+        .peepoArrive {
+            background: url('https://cdn.betterttv.net/emote/5d922afbc0652668c9e52ead/1x');
+        }
+
+        .peepoHappy {
+            background: url('https://cdn.betterttv.net/emote/5a16ee718c22a247ead62d4a/1x');
+        }
+
+        .weirdChamp {
+            background: url('https://cdn.betterttv.net/emote/5d20a55de1cfde376e532972/1x');
+        }
+
+        .PepoCheer {
+            background: url('https://cdn.betterttv.net/emote/5abd36396723dc149c678e90/1x');
+        }
+
+        .FeelsBadMan {
+            background: url('https://cdn.frankerfacez.com/emoticon/33355/1');
+        }
+
+        .FeelsWeirdMan {
+            background: url('https://cdn.betterttv.net/emote/5603731ce5fc5eff1de93229/1x');
+        }
+
+        .ResidentSleeper {
+            background: url('https://static-cdn.jtvnw.net/emoticons/v2/245/static/light/1.0');
+        }
+
+        .FiveHead {
+            background: url('https://cdn.betterttv.net/emote/5d6096974932b21d9c332904/1x');
+        }
+
+        .EZ {
+            background: url('https://cdn.betterttv.net/emote/5590b223b344e2c42a9e28e3/1x');
+        }
+
+        .Clap {
+            background: url('https://cdn.betterttv.net/emote/55b6f480e66682f576dd94f5/1x');
+        }
+
+        @media only screen and (max-width: 900px) {
+            h2 {
+                width: 70%;
+            }
+
+            span {
+                width: 80%;
+            }
+
+            #recents {
+                margin-top: 28%;
+            }
+        }
+
+        .rainbow {
+            text-align: center;
+            text-decoration: underline;
+            font-size: 28px;
+            font-family: monospace;
+            letter-spacing: 5px;
+        }
+
+        .rainbow_text_animated {
+            background: linear-gradient(to right, #6666ff, #0099ff , #00ff00, #ff3399, #6666ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: rainbow_animation 30s ease-in-out infinite;
+            background-size: 400% 100%;
+        }
+
+        @keyframes rainbow_animation {
+            0%,100% {
+                background-position: 0 0;
+            }
+
+            50% {
+                background-position: 100% 0;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div id="header">
+        <h2 class="rainbow rainbow_text_animated">Mirage Twitch Chat</h2>
+    </div>
+    <div id="recentsContainer">
+        <div id="recents">
+        </div>
+    </div>
+    <script type="text/javascript">
+        let entriesToShow = 14;
+        var _fbRef, _fbAuth, _fbDB, datab;
+
+        var firebaseConfig = {
+            apiKey: "AIzaSyAPQoPYzpZTMmmPFH0ICNwg1iELvzd0cd0",
+            authDomain: "route-demo-c1918.firebaseapp.com",
+            databaseURL: "https://route-demo-c1918-default-rtdb.firebaseio.com",
+            projectId: "route-demo-c1918",
+            storageBucket: "route-demo-c1918.appspot.com",
+            messagingSenderId: "296218438189",
+            appId: "1:296218438189:web:1fa5ef7bae5ee0092ea6a4"
+        };
+
+        _fbRef = firebase.initializeApp(firebaseConfig);
+        _fbAuth = firebase.auth();
+        _fbDB = firebase.database();
+        _mirageDB = _fbDB.ref('/mirage');
+        _metricDB = _fbDB.ref('/mirage/metric');
+
+        let usernames = [
+            "WitchKingTron", "iRockstar0406", "Dj_Daddy_P", "BatesMonkey", "good_guychris", "Ryanbeast535", "dragons_breath", "winterlolzzz", "moldnugget", "TheeChief", "Shunjy", "ShinyTriangles", "milkingmoo", "activeplayerr", "george0123444", "Grooth", "sockstv", "Bassoon_Beast", "DankJuicer", "g0atw33d", "wowisgud", "DirtSlap", "Coldblackice", "LoveCBT", "mr_chair_plays", "warworm5", "AnthonyHomie69", "seattlecreeper", "Soapbuddy", "swordmaster", "Feelsericman", "kurtrodgers", "JerryOverwatch", "TacoBell6", "74monkeys", "Lazypanda_", "yung_bruh", "joncurious", "Ultracoffee", "stairs_", "marshfellow", "welldang", "Feats", "Spinich_", "MathDebator", "InnovationIsEpic", "DaddyMagic", "TheWizard_", "PogThroughThePain", "2011SubaruTribeca", "Ballonfest86", "BigMan11", "xXSusLordXx", 
+        ];
+
+        let messages = {
+            "waiting": [
+                "where is literally anyone",
+                "<i class='emote modCheck' title='modCheck'></i>",
+                "<i class='emote peepoLeave' title='peepoLeave'></i>",
+                "<i class='emote FeelsWeirdMan' title='FeelsWeirdMan'></i>",
+                "<i class='emote ResidentSleeper' title='ResidentSleeper'></i>",
+                "nobodys ever coming <i class='emote Sadge' title='Sadge'></i>",
+                "just walk into frame <i class='emote FiveHead' title='5Head'></i>",
+                "so boring, nobodys coming through here",
+                "this stream sucks",
+                "why is there nobody here",
+                "guys lets go watch xqc instead",
+                "imagine having nobody in frame <i class='emote weirdChamp' title='weirdChamp'></i>"
+            ],
+            "0": [
+                "No more people <i class='emote OMEGALUL' title='OMEGALUL'></i>",
+                "LITERALLY NOBODY ANYMORE <i class='emote KEKW' title='KEKW'></i>",
+                "0 PEOPLE HERE <i class='emote KEKW' title='KEKW'></i>",
+                "<i class='emote KEKW' title='KEKW'></i>",
+                "where'd everyone go <i class='emote monkaS' title='monkaS'></i>",
+                "goodbye <i class='emote Sadge' title='Sadge'></i>",
+                "alone again <i class='emote Sadge' title='Sadge'></i>",
+                "aaaand theyre gone",
+                "no don't leave D:",
+                "they left <i class='emote FeelsBadMan' title='FeelsBadMan'></i>"
+            ],
+            "1": [
+                "hello person",
+                "SOMEBODY SHOWED UP <i class='emote PogU' title='PogU'></i>",
+                "A PERSON <i class='emote Pog' title='Pog'></i>",
+                "<i class='emote Pog' title='Pog'></i>",
+                "hello <i class='emote peepoHappy' title='peepoHappy'></i>",
+                "finally someones here <i class='emote PepoCheer' title='PepoCheer'></i>",
+                "we finally got someone <i class='emote EZ' title='EZ'></i><i class='emote Clap' title='Clap'></i>",
+                "imagine being the only person in frame lol",
+                "one person <i class='emote OMEGALUL' title='OMEGALUL'></i>"
+            ], 
+            "2": [
+                "<i class='emote Pog' title='Pog'></i><i class='emote Pog' title='Pog'></i>",
+                "I THOUGHT 2 WAS IMPOSSIBLE <i class='emote Pog' title='Pog'></i>",
+                "2 PEOPLE <i class='emote PogU' title='PogU'></i>",
+                "ACTUALLY MORE THAN ONE PERSON",
+                "BRO 2? <i class='emote PogU' title='PogU'></i>",
+                "TWOOO???",
+                "ayo is that 2 people?"
+            ],
+            "3": [
+                "3"
+            ],
+            "4": [
+                "4"
+            ],
+            "5": [
+                "5"
+            ]
+        };
+
+        let recentsDiv = document.getElementById("recents");
+
+        let waitingTime = 13000;
+
+        let waitingInterval;
+
+        let arr = [], recentsArr = [];
+        let _d;
+
+        _metricDB.once('value').then((snapshot) => {
+            _d = snapshot.val();
+            for (metric in _d) {
+                arr.push(buildMetricObject(_d, metric));
+            }
+            recentsArr = getRecentsArray(arr, entriesToShow);
+
+            _metricDB.on('child_added', (snap) => {
+                _d[snap.key] = snap.val();
+                arr.push(buildMetricObject(_d, snap.key));
+                console.log("built new obj @ " + arr[arr.length - 1].time, arr[arr.length - 1]);
+                recentsArr = getRecentsArray(arr, entriesToShow);
+                newEntry(recentsArr);
+                clearInterval(waitingInterval);
+                waitingInterval = setInterval(function() {
+                    console.log("display waiting chat");
+                    if (recentsDiv.firstChild) {recentsDiv.removeChild(recentsDiv.firstChild);}
+                    let span = createEntrySpan("waiting");
+                    recentsDiv.appendChild(span);
+                }, waitingTime);
+            });
+
+            createSpans(recentsArr);
+        });
+
+        function getRecentsArray(array, x) {
+            return array.slice(array.length - x).reverse();
+        }
+
+        function buildMetricObject(entries, metric) {
+            var newObj = {};
+            let date = new Date(parseInt(metric)).toLocaleString('en-US');
+            let dateAndTime = date.split(", ");
+            newObj.date = dateAndTime[0];
+            newObj.time = dateAndTime[1]
+            newObj.timeStampMS = metric;
+            newObj.sessionId = Object.keys(entries[metric])[0];
+            newObj.logId = Object.keys(entries[metric][newObj.sessionId])[0];
+            newObj.peopleDetected = entries[metric][newObj.sessionId][newObj.logId].detected;
+            newObj.camera = entries[metric][newObj.sessionId][newObj.logId].cam ? entries[metric][newObj.sessionId][newObj.logId].cam : "off-site";
+            newObj.confidence = entries[metric][newObj.sessionId][newObj.logId].con;
+            return newObj;
+        }
+
+        function createSpans(array) {
+            while (recentsDiv.firstChild) {
+                recentsDiv.removeChild(recentsDiv.firstChild);
+            }
+            for (item in array) {
+                let span = createEntrySpan(array[item]);
+                recentsDiv.appendChild(span);
+            }
+        }
+
+        function newEntry(array) {
+            if (recentsDiv.firstChild) {recentsDiv.removeChild(recentsDiv.firstChild);}
+            let span = createEntrySpan(array[0]);
+            recentsDiv.appendChild(span);
+        }
+
+        function createEntrySpan(entry) {
+            let span = document.createElement("span"), userSpan = document.createElement("span");
+            let randNum;
+            userSpan.innerHTML = usernames[randomNum(usernames.length)];
+            userSpan.style.color = randomColor();
+            userSpan.classList.add("username");
+            if (entry === "waiting") {
+                randNum = randomNum(messages.waiting.length);
+                let time = new Date().toLocaleString('en-US');
+                let dateAndTime = time.split(", ");
+                time = dateAndTime[1];
+                span.innerHTML = "[" + time + "] ";
+                span.appendChild(userSpan); 
+                span.innerHTML += ": " + messages.waiting[randNum];
+                return span;
+            }
+            randNum = randomNum([(messages[entry.peopleDetected].length)]);
+            span.innerHTML = "[" + entry.time + "] ";
+            span.appendChild(userSpan);
+            span.innerHTML += ": " + messages[entry.peopleDetected][randNum];
+            return span;
+        }
+
+        function randomNum(length) {
+            return Math.floor(Math.random() * length);
+        }
+
+        function randomColor() {
+            return "#" + Math.floor(Math.random()*16777215).toString(16);
+        }
+
+    </script>
+</body>
+</html>
